@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "dgSpecHash": "m5Fu6x9gmUs=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\redbe\\LearningWeb\\LearningWeb\\LearningWeb.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\redbe\\.nuget\\packages\\microsoft.extensions.identity.core\\10.0.14\\microsoft.extensions.identity.core.10.0.14.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.Extensions.Identity.Core は削除されません。このパッケージは自動的に利用可能になるため、明示的に参照する必要はありません。PackageReference 項目を削除します。",
+      "projectPath": "C:\\Users\\redbe\\LearningWeb\\LearningWeb\\LearningWeb.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\redbe\\LearningWeb\\LearningWeb\\LearningWeb.csproj",
+      "libraryId": "Microsoft.Extensions.Identity.Core",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}
