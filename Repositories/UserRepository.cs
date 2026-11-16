@@ -11,7 +11,8 @@ public class UserRepository
         {
             Id = 1,
             UserName = "Taro",
-            Email = "taro@example.com"
+            Email = "taro@example.com",
+            Role = "User"
         };
         var hasher = new PasswordHasher<User>();
 
@@ -20,6 +21,20 @@ public class UserRepository
             "Password123!"
         );
         _users = new List<User> { user };
+
+        var jiro = new User
+        {
+            Id = 2,
+            UserName = "Jiro",
+            Email = "jiro@example.com",
+            Role = "User"
+        };
+
+        jiro.PasswordHash = hasher.HashPassword(
+            jiro,
+            "Password456!"
+        );
+        _users.Add(jiro);
     }
 
     public string GetUserName(int id)
@@ -33,6 +48,13 @@ public class UserRepository
     {
         return _users.FirstOrDefault(
             u => u.Email == email
+        );
+    }
+
+    public User? GetUserById(int id)
+    {
+        return _users.FirstOrDefault(
+            u => u.Id == id
         );
     }
 }

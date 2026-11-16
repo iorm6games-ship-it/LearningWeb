@@ -31,12 +31,20 @@ public class UserService
         return result != PasswordVerificationResult.Failed;
     }
 
-    public bool Login(string email, string password)
+    public LoginUser? Login(string email, string password)
     {
         User? user = _repository.GetUserByEmail(email);
 
-        if (user == null) return false;
+        if (user == null) return null;
 
-        return VerifyPassword(user, password);
+        if (!VerifyPassword(user, password)) return null;
+
+        return new LoginUser
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Role = user.Role
+        };
     }
+    
 }

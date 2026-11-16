@@ -26,3 +26,4 @@ C:\Users\redbe\LearningWeb\LearningWeb\obj\Debug\net10.0\refint\LearningWeb.dll
 C:\Users\redbe\LearningWeb\LearningWeb\obj\Debug\net10.0\LearningWeb.pdb
 C:\Users\redbe\LearningWeb\LearningWeb\obj\Debug\net10.0\LearningWeb.genruntimeconfig.cache
 C:\Users\redbe\LearningWeb\LearningWeb\obj\Debug\net10.0\ref\LearningWeb.dll
+C:\Users\redbe\LearningWeb\LearningWeb\obj\Debug\net10.0\LearningWeb.sourcelink.json
