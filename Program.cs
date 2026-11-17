@@ -15,6 +15,9 @@ builder.Services
     .AddCookie(
         options =>
         {
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(2);
+            options.SlidingExpiration = true;
+
             options.Events.OnRedirectToLogin = context =>
             {
                 context.Response.StatusCode =
@@ -31,6 +34,7 @@ builder.Services
 
             options.Events.OnValidatePrincipal = async context =>
             {
+                
                 string? idText = context.Principal?
                     .FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 
@@ -66,8 +70,6 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Admin");
     });
 });
-
-builder.Services.AddAuthorization();
 
 var app = builder.Build();
 app.UseAuthentication();
@@ -125,15 +127,23 @@ app.MapPost("/login", async (
     return Results.Ok("ログイン成功");
 });
 
-app.MapGet("/mypage", (HttpContext context) =>
+app.MapGet("/mypage", async (HttpContext context) =>
 {
     var identity = context.User.Identity;
     var user = context.User;
+    var result = await context.AuthenticateAsync(
+        CookieAuthenticationDefaults.AuthenticationScheme
+    );
 
     return Results.Ok(new
     {
         IsAuthenticated = identity?.IsAuthenticated,
         Name = identity?.Name,
+
+        IssuedUtc = result.Properties?.IssuedUtc,
+        ExpiresUtc = result.Properties?.ExpiresUtc,
+
+        ServerUtcNow = DateTimeOffset.UtcNow,
         IsAdmin = user?.IsInRole("Admin")
     });
 })
