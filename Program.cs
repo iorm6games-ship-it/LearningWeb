@@ -5,10 +5,14 @@ using LearningWeb.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using System.Runtime.CompilerServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var userRepository = new UserRepository();
+
+builder.Services.AddSingleton(userRepository);
+builder.Services.AddTransient<UserService>();
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -62,6 +66,17 @@ builder.Services
             };
         }
     );
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactPolicy", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
 
 builder.Services.AddAuthorization(options =>
 {
@@ -72,6 +87,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+app.UseCors("ReactPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -80,6 +96,7 @@ var container = new UserServiceContainer();
 container.Register(() => new UserService(userRepository));
 
 app.MapGet("/", () => "トップページ");
+app.MapGet("/hello", () => "Hello from LearningWeb!");
 
 app.MapGet("/user/{id:int}", (int id) =>
 {
@@ -90,20 +107,21 @@ app.MapGet("/user/{id:int}", (int id) =>
 
 app.MapPost("/login", async (
     LoginRequest request,
-    HttpContext context) =>
+    HttpContext context,
+    UserService service) =>
 {
-    var service = container.Get();
-
+    Console.WriteLine("① /login に到達");
     LoginUser? loginUser = service.Login(
         request.Email,
         request.Password
     );
+    Console.WriteLine($"Email: {loginUser?.Email}");
 
     if (loginUser == null)
     {
         return Results.Unauthorized();
     }
-
+    
     var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, loginUser.Id.ToString()),
@@ -129,19 +147,24 @@ app.MapPost("/login", async (
 
 app.MapGet("/mypage", async (HttpContext context) =>
 {
+    
+    Console.WriteLine(
+        $"認証済: {context.User.Identity?.IsAuthenticated}"
+    );
+    Console.WriteLine(
+        $"ユーザー名: {context.User.Identity?.Name}"
+    );
+    Console.WriteLine(
+        $"Role: {context.User.FindFirst(ClaimTypes.Role)?.Value}"
+    );
     var identity = context.User.Identity;
     var user = context.User;
-    var result = await context.AuthenticateAsync(
-        CookieAuthenticationDefaults.AuthenticationScheme
-    );
+
 
     return Results.Ok(new
     {
         IsAuthenticated = identity?.IsAuthenticated,
         Name = identity?.Name,
-
-        IssuedUtc = result.Properties?.IssuedUtc,
-        ExpiresUtc = result.Properties?.ExpiresUtc,
 
         ServerUtcNow = DateTimeOffset.UtcNow,
         IsAdmin = user?.IsInRole("Admin")
